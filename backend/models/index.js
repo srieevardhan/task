@@ -1,7 +1,7 @@
 const { sequelize } = require("../config/db");
 
-const User = require("./User");
-const Task = require("./Task");
+const User = require("./user");
+const Task = require("./task");
 
 // Associations
 User.hasMany(Task, { foreignKey: "userId" });
