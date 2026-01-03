@@ -2,7 +2,7 @@ const { Task } = require("../models");
 
 // CREATE TASK
 const createTask = async (req, res) => {
-  const { title, status } = req.body;
+  const { title, status, deadline } = req.body;
 
   if (!title) {
     return res.status(400).json({ message: "Title is required" });
@@ -11,6 +11,7 @@ const createTask = async (req, res) => {
   const task = await Task.create({
     title,
     status,
+    deadline, // Save deadline
     userId: req.user.id,
   });
 

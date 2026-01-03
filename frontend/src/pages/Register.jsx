@@ -1,35 +1,21 @@
-import { useState, useEffect } from "react";
-import { Link, useNavigate } from "react-router-dom";
+import { useState } from "react";
 import api from "../services/api";
+import { useNavigate, Link } from "react-router-dom";
 
 export default function Register() {
+  const [name, setName] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
-  const [loading, setLoading] = useState(false);
-
   const navigate = useNavigate();
-
-  // 🚫 If already logged in, go to tasks
-  useEffect(() => {
-    if (localStorage.getItem("token")) {
-      navigate("/tasks");
-    }
-  }, [navigate]);
 
   const submit = async (e) => {
     e.preventDefault();
-    setLoading(true);
-
     try {
-      await api.post("/auth/register", { email, password });
-      alert("Registered successfully. Please login.");
+      await api.post("/auth/register", { name, email, password });
+      alert("Registration successful");
       navigate("/");
     } catch (err) {
-      alert(
-        err.response?.data?.msg || "Registration failed"
-      );
-    } finally {
-      setLoading(false);
+      alert(err.response?.data?.message || "Register failed");
     }
   };
 
@@ -38,6 +24,13 @@ export default function Register() {
       <div className="card">
         <form onSubmit={submit}>
           <h2>Register</h2>
+
+          <input
+            placeholder="Name"
+            value={name}
+            onChange={(e) => setName(e.target.value)}
+            required
+          />
 
           <input
             type="email"
@@ -55,12 +48,10 @@ export default function Register() {
             required
           />
 
-          <button type="submit" disabled={loading}>
-            {loading ? "Registering..." : "Register"}
-          </button>
+          <button type="submit">Register</button>
 
           <p style={{ textAlign: "center", marginTop: "10px" }}>
-            Already have an account? <Link to="/">Login</Link>
+            Already have an account? <Link to="/">Login here</Link>
           </p>
         </form>
       </div>

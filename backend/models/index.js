@@ -1,12 +1,58 @@
 const { sequelize } = require("../config/db");
+const { DataTypes } = require("sequelize");
 
-const User = require("./User");
-const Task = require("./Task");
+// --- USER MODEL ---
+const User = sequelize.define("User", {
+  id: {
+    type: DataTypes.UUID,
+    defaultValue: DataTypes.UUIDV4,
+    primaryKey: true,
+  },
+  name: {
+    type: DataTypes.STRING,
+    allowNull: false,
+  },
+  email: {
+    type: DataTypes.STRING,
+    allowNull: false,
+    unique: true,
+  },
+  password: {
+    type: DataTypes.STRING,
+    allowNull: false,
+  },
+});
 
-// Associations
+// --- TASK MODEL ---
+const Task = sequelize.define("Task", {
+  id: {
+    type: DataTypes.UUID,
+    defaultValue: DataTypes.UUIDV4,
+    primaryKey: true,
+  },
+  title: {
+    type: DataTypes.STRING,
+    allowNull: false,
+  },
+  status: {
+    type: DataTypes.ENUM("Todo", "In Progress", "Completed"),
+    defaultValue: "Todo",
+  },
+  deadline: {
+    type: DataTypes.DATEONLY,
+    allowNull: true,
+  },
+  userId: {
+    type: DataTypes.UUID,
+    allowNull: false,
+  },
+});
+
+// --- ASSOCIATIONS ---
 User.hasMany(Task, { foreignKey: "userId" });
 Task.belongsTo(User, { foreignKey: "userId" });
 
+// --- SYNC FUNCTION ---
 const syncDB = async () => {
   try {
     await sequelize.sync({ alter: true });
@@ -17,4 +63,3 @@ const syncDB = async () => {
 };
 
 module.exports = { sequelize, User, Task, syncDB };
- 
