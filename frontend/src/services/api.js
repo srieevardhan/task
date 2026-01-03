@@ -1,7 +1,7 @@
 import axios from "axios";
 
 const api = axios.create({
-  baseURL: " https://task-uqdf.onrender.com/api",
+  baseURL: " https://task-uqdf.onrender.com",
 });
 
 api.interceptors.request.use((config) => {
