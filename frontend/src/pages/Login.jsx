@@ -1,9 +1,7 @@
-import { Link } from "react-router-dom";
-
+import { Link, useNavigate } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
 import { loginUser } from "../features/auth/authSlice";
 import { useState, useEffect } from "react";
-import { useNavigate } from "react-router-dom";
 
 export default function Login() {
   const [email, setEmail] = useState("");
@@ -11,48 +9,59 @@ export default function Login() {
 
   const dispatch = useDispatch();
   const navigate = useNavigate();
-  const { user } = useSelector((state) => state.auth);
+  const { user, loading, error } = useSelector((state) => state.auth);
 
-  // 🔑 REDIRECT AFTER LOGIN
+  // ✅ Redirect if already logged in (token exists)
   useEffect(() => {
-  if (user) {
-    navigate("/tasks");
-  }
-}, [user, navigate]);
+    const token = localStorage.getItem("token");
+    if (token && user) {
+      navigate("/tasks");
+    }
+  }, [user, navigate]);
 
-
-  const submit = (e) => {
+  const submit = async (e) => {
     e.preventDefault();
-    dispatch(loginUser({ email, password }));
+
+    try {
+      await dispatch(loginUser({ email, password })).unwrap();
+      navigate("/tasks"); // ✅ immediate redirect
+    } catch (err) {
+      alert("Invalid email or password");
+    }
   };
 
   return (
     <div className="page">
-  <div className="card">
-    <form onSubmit={submit}>
-      <h2>Login</h2>
+      <div className="card">
+        <form onSubmit={submit}>
+          <h2>Login</h2>
 
-      <input
-        placeholder="Email"
-        value={email}
-        onChange={(e) => setEmail(e.target.value)}
-      />
+          <input
+            type="email"
+            placeholder="Email"
+            value={email}
+            onChange={(e) => setEmail(e.target.value)}
+            required
+          />
 
-      <input
-        type="password"
-        placeholder="Password"
-        value={password}
-        onChange={(e) => setPassword(e.target.value)}
-      />
+          <input
+            type="password"
+            placeholder="Password"
+            value={password}
+            onChange={(e) => setPassword(e.target.value)}
+            required
+          />
 
-      <button type="submit">Login</button>
+          <button type="submit" disabled={loading}>
+            {loading ? "Logging in..." : "Login"}
+          </button>
 
-      <p style={{ textAlign: "center", marginTop: "10px" }}>
-        New user? <Link to="/register">Register here</Link>
-      </p>
-    </form>
-  </div>
-</div>
-
+          <p style={{ textAlign: "center", marginTop: "10px" }}>
+            New user? <Link to="/register">Register here</Link>
+          </p>
+        </form>
+      </div>
+    </div>
   );
 }
+
